@@ -9,8 +9,8 @@ randomise = False          # False = fixed L-shaped wall
 
 # fixed-layout parameters (grid coords)
 FRONT_ROW = 6              # wall 1.2 m ahead
-RIGHT_COL = 15             # right wall at y = -0.7 m
-LEFT_GAP  = 8              # columns left open as the escape route
+LEFT_COL  = 29             # left wall at y = +0.7 m
+RIGHT_GAP = 9              # columns left open as the escape route
 
 workspace_directory = os.path.dirname(os.path.realpath(__file__))[:-22]
 overwrite_file = workspace_directory + '/rb2301_gz/worlds/obstacle_world_ca1.sdf'
@@ -32,9 +32,9 @@ def generate_maze():
 
 def generate_fixed():
     maze_arr = np.zeros((height, width))
-    maze_arr[FRONT_ROW, RIGHT_COL:width - LEFT_GAP] = 1   # wall across the front
-    maze_arr[0:FRONT_ROW + 1, RIGHT_COL] = 1              # wall down the right side
-    maze_arr[:3, int(width/2)-3:int(width/2)+4] = 0       # keep spawn clear
+    maze_arr[FRONT_ROW, RIGHT_GAP:LEFT_COL + 1] = 1   # wall across the front
+    maze_arr[0:FRONT_ROW + 1, LEFT_COL] = 1           # wall down the left side
+    maze_arr[:3, int(width/2)-3:int(width/2)+4] = 0   # keep spawn clear
     return maze_arr
 
 

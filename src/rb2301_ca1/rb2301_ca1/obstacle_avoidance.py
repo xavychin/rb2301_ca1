@@ -25,6 +25,9 @@ class ObstacleAvoidanceNode(Node):
 
         self.timer = self.create_timer(0.05, self.timer_callback)  # Runs at 20Hz. Can be changed.
 
+        self.dir = 0.4
+        self.turning = False
+
     def move_2D(self, x: float = 0.0, y: float = 0.0, turn: float = 0.0):
         """Publishes a twist command to move in 2D space. +ve x is forwards, +ve y is left, and +ve turn is anticlockwise"""
         twist_msg = Twist()
@@ -47,7 +50,45 @@ class ObstacleAvoidanceNode(Node):
         
         ######################## MODIFY CODE HERE ########################
         self.get_logger().debug(str(self.last_scan))
-        self.move_2D(0.2, 0.0, 0.0)
+
+        front = np.take(self.last_scan, [-1, 0, 1], mode='wrap')
+        frontL = self.last_scan[2:5]
+        frontR = self.last_scan[-4:-1]
+        left = self.last_scan[8:11]
+        right = self.last_scan[26:29]
+        CLEAR = 0.35
+
+        if any(r <= 0.3 for r in front):
+            if not self.turning:
+                self.turning = True
+                self.dir = -self.dir     
+
+            elif any(r <= 0.3 for r in left):
+                print("Left")
+                self.dir = -0.4
+
+            elif any(r <= 0.3 for r in right):
+                print("Right")
+                self.dir = 0.4
+
+            self.move_2D(0.0, self.dir, 0.0)
+
+        elif any(r <= 0.1 for r in left):
+            self.move_2D(0.0, -0.2, 0.0)
+
+        elif any(r <= 0.1 for r in right):
+            self.move_2D(0.0, 0.2, 0.0)
+
+        elif any(r <= 0.3 for r in frontL):
+            self.move_2D(0.2, -0.4, 0.0)
+
+        elif any(r <= 0.3 for r in frontR):
+            self.move_2D(0.2, 0.4, 0.0)
+
+        else:
+            if all(r > CLEAR for r in front):
+                self.turning = False      
+            self.move_2D(0.4, 0.0, 0.0)
 
         ######################## MODIFY CODE HERE ########################
 
